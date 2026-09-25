@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Business Chat - Preeti</title>
+    <style>
+        :root {
+            --primary-red: #b30000;
+            --light-red: #ff4d4d;
+            --bg-color: #fff5f5;
+            --text-dark: #333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        .app-container { width: 100%; max-width: 480px; height: 100%; background: #fff; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(179,0,0,0.2); }
+        
+        /* Header */
+        .app-header { background-color: var(--primary-red); color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .header-profile { display: flex; align-items: center; gap: 12px; }
+        .app-header img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+        .app-header h2 { font-size: 18px; }
+        .app-header p { font-size: 12px; color: #ffcccc; }
+        .logout-btn { background: #fff; color: var(--primary-red); border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+        /* Screens */
+        .screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .hidden { display: none !important; }
+
+        /* Login Screen */
+        .login-box { padding: 30px; display: flex; flex-direction: column; gap: 15px; justify-content: center; height: 100%; }
+        .login-box h2 { color: var(--primary-red); text-align: center; margin-bottom: 10px; }
+        .input-field { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; outline: none; }
+        .input-field:focus { border-color: var(--primary-red); }
+        .btn { background-color: var(--primary-red); color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background-color: #990000; }
+        .note { font-size: 12px; color: #666; text-align: center; margin-top: 5px; }
+
+        /* Chat List Screen */
+        .chat-list { flex: 1; overflow-y: auto; }
+        .chat-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; gap: 12px; }
+        .chat-item:hover { background-color: #fff0f0; }
+        .chat-item img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .chat-info h4 { font-size: 16px; color: #111; }
+        .chat-info p { font-size: 13px; color: #666; margin-top: 3px; }
+
+        /* Chat Room Screen */
+        .messages-area { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 75%; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.4; word-break: break-word; }
+        .message.received { background: white; align-self: flex-start; border: 1px solid #ddd; }
+        .message.sent { background: #ffe6e6; align-self: flex-end; color: #990000; }
+
+        .chat-input-area { padding: 10px 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #ddd; align-items: center; }
+        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
+        .send-btn { background: var(--primary-red); color: white; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; }
+    </style>
+</head>
+<body onload="checkAutoLogin()">
+
+    <div class="app-container">
+        
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-profile">
+                <img id="headerDp" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="DP">
+                <div>
+                    <h2 id="headerTitle">My Business Chat</h2>
+                    <p id="headerSubtitle">خوش آمدید</p>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">لاگ آؤٹ</button>
+        </div>
+
+        <!-- 1. Login Screen -->
+        <div id="loginScreen" class="screen">
+            <div class="login-box">
+                <h2>لاگ ان کریں</h2>
+                <input type="text" id="userName" class="input-field" placeholder="اپنا نام لکھیں">
+                <input type="text" id="userPhone" class="input-field" placeholder="فون نمبر (مثلاً 03001234567)">
+                <input type="password" id="userPass" class="input-field" placeholder="پاس ورڈ (صرف ایڈمن پریتی کے لیے)">
+                <input type="text" id="userDp" class="input-field" placeholder="اپنی تصویر کا لنک (DP Link) - اختیاری">
+                <button class="btn" onclick="handleLogin()">شروع کریں</button>
+                <div class="note">نوٹ: ایڈمن (Preeti) لاگ ان کے لیے نام Preeti اور پاس ورڈ preeti123 درج کریں۔</div>
+            </div>
+        </div>
+
+        <!-- 2. Main App Screen -->
+        <div id="mainScreen" class="screen hidden">
+            <!-- Chat List Container -->
+            <div id="chatsContainer" class="chat-list">
+                <!-- Dynamic chats will load here -->
+            </div>
+        </div>
+
+        <!-- 3. Chat Room Screen -->
+        <div id="chatRoomScreen" class="screen hidden">
+            <div style="background: #eee; padding: 10px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="backToMain()">
+                <strong>← واپس جائیں</strong>
+                <span id="chatTitle" style="font-weight: bold; color: var(--primary-red);">چیٹ</span>
+            </div>
+            
+            <div class="messages-area" id="messagesArea">
+                <!-- Messages will load here -->
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="messageInput" placeholder="یہاں میسج لکھیں...">
+                <button class="send-btn" onclick="sendMessage()">بھیجیں</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentChatRoom = '';
+        let currentUser = null;
+
+        function checkAutoLogin() {
+            const savedUser = localStorage.getItem('chat_active_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                setupAppUI();
+            }
+        }
+
+        function handleLogin() {
+            const name = document.getElementById('userName').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+            const pass = document.getElementById('userPass').value.trim();
+            const dp = document.getElementById('userDp').value.trim();
+
+            if (!name || !phone) {
+                alert('براہ کرم نام اور فون نمبر لازمی درج کریں!');
+                return;
+            }
+
+            let isAdmin = (name.toLowerCase() === 'preeti' && pass === 'preeti123');
+            
+            currentUser = {
+                name: name,
+                phone: phone,
+                isAdmin: isAdmin,
+                dp: dp || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'
+            };
+
+            localStorage.setItem('chat_active_user', JSON.stringify(currentUser));
+
+            // Save user to global users list if not admin
+            if (!isAdmin) {
+                let allUsers = JSON.parse(localStorage.getItem('chat_all_users') || '[]');
+                if (!allUsers.some(u => u.phone === phone)) {
+                    allUsers.push(currentUser);
+                    localStorage.setItem('chat_all_users', JSON.stringify(allUsers));
+                }
+            }
+
+            setupAppUI();
+        }
+
+        function setupAppUI() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            document.getElementById('headerDp').src = currentUser.dp;
+            
+            if (currentUser.isAdmin) {
+                document.getElementById('headerSubtitle').innerText = 'پریتی (Admin Panel)';
+                loadAdminChatList();
+            } else {
+                document.getElementById('headerSubtitle').innerText = currentUser.name;
+                // For normal user, open chat directly with Preeti (Admin)
+                openChat('Preeti_Admin_' + currentUser.phone, 'Preeti (Admin)');
+            }
+        }
+
+        function loadAdminChatList() {
+            const container = document.getElementById('chatsContainer');
+            container.innerHTML = '';
+            
+            let allUsers = JSON.parse(localStorage.getItem('chat_all_users') || '[]');
+            
+            if (allUsers.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">ابھی تک کوئی نیا یوزر نہیں آیا۔ جب فیملی ممبرز لاگ ان کریں گے تو ان کی چیٹس یہاں شو ہوں گی۔</div>';
+                return;
+            }
+
+            allUsers.forEach(u => {
+                const roomKey = 'Preeti_Admin_' + u.phone;
+                const item = document.createElement('div');
+                item.className = 'chat-item';
+                item.onclick = () => openChat(roomKey, u.name + ' (' + u.phone + ')');
+                item.innerHTML = `
+                    <img src="${u.dp}" alt="DP">
+                    <div class="chat-info">
+                        <h4>${u.name}</h4>
+                        <p>فون نمبر: ${u.phone}</p>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function openChat(roomKey, title) {
+            currentChatRoom = roomKey;
+            if (currentUser.isAdmin) {
+                document.getElementById('mainScreen').classList.add('hidden');
+            }
+            document.getElementById('chatRoomScreen').classList.remove('hidden');
+            document.getElementById('chatTitle').innerText = title;
+            loadMessages();
+        }
+
+        function backToMain() {
+            document.getElementById('chatRoomScreen').classList.add('hidden');
+            if (currentUser.isAdmin) {
+                document.getElementById('mainScreen').classList.remove('hidden');
+                loadAdminChatList();
+            } else {
+                // Normal user can just stay or log out
+            }
+        }
+
+        function loadMessages() {
+            const area = document.getElementById('messagesArea');
+            area.innerHTML = '';
+            const allMessages = JSON.parse(localStorage.getItem('msgs_' + currentChatRoom) || '[]');
+            
+            if (allMessages.length === 0) {
+                area.innerHTML = '<div class="message received">چیٹ شروع ہو چکی ہے، اپنا پیغام یہاں لکھیں۔</div>';
+                return;
+            }
+
+            allMessages.forEach(m => {
+                const msg = document.createElement('div');
+                msg.className = 'message ' + (m.sender === currentUser.name ? 'sent' : 'received');
+                msg.innerText = m.sender + ': ' + m.text;
+                area.appendChild(msg);
+            });
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                let allMessages = JSON.parse(localStorage.getItem('msgs_' + currentChatRoom) || '[]');
+                allMessages.push({ sender: currentUser.name, text: text });
+                localStorage.setItem('msgs_' + currentChatRoom, JSON.stringify(allMessages));
+
+                input.value = '';
+                loadMessages();
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('chat_active_user');
+            location.reload();
+        }
+    </script>
+</body>
+</html>
