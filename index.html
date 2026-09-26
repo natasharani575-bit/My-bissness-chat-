@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پرائیویট فیملی چیٹ ایپ</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome Icons for WhatsApp style icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- 1. Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="login-card">
+            <div class="app-logo"><i class="fa-brands fa-whatsapp"></i></div>
+            <h2>فیملی چیٹ میں خوش آمدید</h2>
+            <p>اپنا نام درج کریں تاکہ فیملی ممبرز آپ کو پہچان سکیں</p>
+            <input type="text" id="username-input" placeholder="अपना नाम दर्ज करें (مثلاً: عائشہ)">
+            <button id="login-btn" onclick="loginUser()">شروع کریں</button>
+        </div>
+    </div>
+
+    <!-- 2. Main Chat App Screen -->
+    <div id="app-screen" class="screen">
+        <div class="app-container">
+            <!-- Sidebar: User Profile & Contact List -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="user-profile">
+                        <img src="https://via.placeholder.com/40" alt="Profile" id="my-avatar">
+                        <span id="display-my-name">نام</span>
+                    </div>
+                    <div class="sidebar-icons">
+                        <i class="fa-solid fa-users" title="فیملی ممبرز"></i>
+                        <i class="fa-solid fa-comment-alt" title="نئی چیٹ"></i>
+                        <i class="fa-solid fa-ellipsis-vertical" title="سیٹنگز"></i>
+                    </div>
+                </div>
+                
+                <!-- Search Box -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="search-contact" placeholder="نمبر یا نام تلاش کریں...">
+                    </div>
+                </div>
+
+                <!-- Contacts List -->
+                <div class="contact-list" id="contact-list">
+                    <!-- Dynamic contacts will appear here -->
+                    <div class="contact-item active" onclick="openChat('فیملی گروپ')">
+                        <div class="contact-avatar">👥</div>
+                        <div class="contact-info">
+                            <div class="contact-name">فیملی گروپ (الگ خاندان)</div>
+                            <div class="contact-status">سب لوگ آن لائن ہیں</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="chat-area">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="active-chat-info">
+                        <div class="contact-avatar" id="active-avatar">👥</div>
+                        <div>
+                            <div class="chat-title" id="active-chat-name">فیملی گروپ</div>
+                            <div class="chat-last-seen" id="active-last-seen">آن لائن (Last Seen: Just Now)</div>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <i class="fa-solid fa-video" title="ویڈیو کال" onclick="startVideoCall()"></i>
+                        <i class="fa-solid fa-phone" title="آڈیو کال" onclick="startAudioCall()"></i>
+                        <i class="fa-solid fa-paperclip" title="میڈیا بھیجیں"></i>
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </div>
+                </div>
+
+                <!-- Messages Body -->
+                <div class="messages-container" id="messages-container">
+                    <div class="message-date-badge">آج</div>
+                    <div class="message received">
+                        <div class="msg-text">سلام! سب لوگ کیسے ہیں؟ یہ ہماری اپنی پرائیویট ایپ ہے۔</div>
+                        <div class="msg-time">रात 8:00 PM</div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Footer -->
+                <div class="chat-footer">
+                    <i class="fa-regular fa-face-smile" title="ایموجی"></i>
+                    <input type="text" id="message-input" placeholder="پیغام یہاں لکھیں..." onkeypress="checkEnter(event)">
+                    <i class="fa-solid fa-microphone" title="وائس نوٹ"></i>
+                    <button class="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video/Audio Call Simulated Modal -->
+    <div id="call-modal" class="call-modal">
+        <div class="call-box">
+            <h3 id="call-status-text">ویڈیو کال مل رہی ہے...</h3>
+            <div class="call-avatar-pulse">📞</div>
+            <button class="end-call-btn" onclick="endCall()">کال بند کریں</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
